@@ -1,0 +1,39 @@
+
+This is a simple C++ Command Line Parser.
+
+It allows for creation of command line options with the following attributes:
+- the command line option text
+- help text related to the particular option
+- mandatory flag
+- default value, if option is not mandatory
+
+Different CmdLineOption classes have been implemented depending on the
+command line value as follows:
+- CmdLineOptionStr
+- CmdLineOptionInt
+- CmdLineOptionFloat
+- CmdLineOptionFlag
+Ive considered making these templatized instead of seperate classes,
+but dont see much benefit in doing so.
+
+Mutual exclusive values can be created, by which only one of the
+options can be specified on the command line.  Currently, only one
+main mutual exclusion group can be created, but I would like to
+have groups of mutually exclusive options.
+
+Once all the options have been created, and optionally the max and
+min number of cmdLine options set, simply call:
+  CmdLineParser::parseCmdLine(argc, argv)
+And all the parsing will be handled. To get the value for each option,
+call the following:
+  (CmdLineParser::getCmdLineOption(key))->getValue()
+where the key is the command line option text.
+
+Currently, no exceptions are thrown, (since we cant use exceptions
+in our code here at work :( but I would like to possibly make
+a conditionally compiled version with exceptions.
+
+TODO
+1) Mutual exclusion groups
+2) Exceptions
+3) Tests - currently refer to the usage in LoanCalculatorCpp
