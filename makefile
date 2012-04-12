@@ -25,4 +25,4 @@ CmdLineParser$(OBJ_EXTENSION): CmdLineParser.cc
 	$(CC) $(CCFLAGS) $(INCLUDE_PATH) -c CmdLineParser.cc -o CmdLineParser$(OBJ_EXTENSION)
 
 clean:
-	$(DELETE_CMD) $(OBJS) $(EXE_NAME)
+	$(DELETE_CMD) $(OBJS) $(LIB_NAME)
