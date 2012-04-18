@@ -80,6 +80,11 @@ CmdLineOption *CmdLineParser::getMutExclOption()
 
 void CmdLineParser::printUsage()
 {
+  if(!mainHelpText_.empty())
+  {
+    cout << mainHelpText_ << "\n";
+  }
+
   cout << "\nUsage:\n"
        << "Input values:\n";
 
@@ -122,6 +127,11 @@ void CmdLineParser::printUsage()
   }
   cout << endl;
 
+  if(!mainHelpTextEnd_.empty())
+  {
+    cout << endl << mainHelpTextEnd_ << endl;
+  }
+  cout << endl;
 }
 
 bool CmdLineParser::parseCmdLine(int argc, char **argv)

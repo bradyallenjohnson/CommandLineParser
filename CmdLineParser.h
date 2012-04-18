@@ -146,9 +146,23 @@ public:
   // Get the mutually exclusive option that was set, if any
   CmdLineOption *getMutExclOption();
 
+  // Additional help text displayed first
+  inline void setMainHelpText(const string &text) { mainHelpText_ = text; }
+  inline string &getMainHelpText() { return mainHelpText_; }
+
+  // Additional help text displayed at the end, after the options
+  inline void setMainHelpTextEnd(const string &text) { mainHelpTextEnd_ = text; }
+  inline string &getMainHelpTextEnd() { return mainHelpTextEnd_; }
+
   inline void setMutExclUsageText(const string &text) { mutExclUsageText_ = text; }
+  inline string &getMutExclUsageText() { return mutExclUsageText_; }
+
   inline void setMinNumberArgs(uint16_t min) { minNumberArgs_ = min; }
+  inline uint16_t getMinNumberArgs() { return minNumberArgs_; }
+
   inline void setMaxNumberArgs(uint16_t max) { maxNumberArgs_ = max; }
+  inline uint16_t getMaxNumberArgs() { return maxNumberArgs_; }
+
   bool parseCmdLine(int argc, char **argv);
   void printUsage();
 
@@ -176,5 +190,7 @@ private:
   uint16_t minNumberArgs_;
   uint16_t maxNumberArgs_;
   string mutExclUsageText_;
+  string mainHelpText_;
+  string mainHelpTextEnd_;
 };
 
