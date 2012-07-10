@@ -13,7 +13,7 @@ class CmdLineOption
 {
 public:
   // Constructors defined below as protected and private
-  ~CmdLineOption();
+  virtual ~CmdLineOption() {}
 
   enum OPTION_TYPE
   {
@@ -27,7 +27,14 @@ public:
   // Getters/Setters
   inline void setCmdLine(const string &cmdLine) { cmdLine_ = cmdLine; }
   inline string getCmdLine() const { return cmdLine_; }
-
+  
+  // An alias allows for things like: -v and -verbose
+  typedef list<string> CmdLineAliasListType;
+  inline void setCmdLineAlias(const string &cmdLine) { cmdLineAliases_.push_back(cmdLine); }
+  inline bool hasCmdLineAlias() const { return ! cmdLineAliases_.empty(); }
+  inline CmdLineAliasListType::const_iterator getCmdLineAliasIterBegin() const { return cmdLineAliases_.begin(); }
+  inline CmdLineAliasListType::const_iterator getCmdLineAliasIterEnd()   const { return cmdLineAliases_.end(); }
+  
   inline void setHelpText(const string &helpText) { helpText_ = helpText; }
   inline string getHelpText() const { return helpText_; }
 
@@ -47,6 +54,7 @@ protected:
   bool isMandatory_;
   bool isValueSet_;
   OPTION_TYPE optionType_;
+  CmdLineAliasListType cmdLineAliases_;
 
 private:
   CmdLineOption(); // Cant call the default version
@@ -63,9 +71,9 @@ public:
       CmdLineOption(cmdLine, helpText, false, OPTION_STR) { setValue(defaultValue); }
   CmdLineOptionStr(const string &cmdLine, const string &helpText, bool isMandatory=false) :
       CmdLineOption(cmdLine, helpText, isMandatory, OPTION_STR) {}
-  ~CmdLineOptionStr();
+  ~CmdLineOptionStr() {}
   inline string getValue() const { return valueStr_; }
-  inline void setValue(const string &value) { valueStr_ = value; isValueSet_ = true; }
+  inline void setValue(const string &value) { if(!value.empty()) {valueStr_ = value; isValueSet_ = true;} }
 
 private:
   CmdLineOptionStr(); // Cant call the default version
@@ -81,9 +89,10 @@ public:
       CmdLineOption(cmdLine, helpText, false, OPTION_INT) { setValue(defaultValue); }
   CmdLineOptionInt(const string &cmdLine, const string &helpText, bool isMandatory=false) :
       CmdLineOption(cmdLine, helpText, isMandatory, OPTION_INT) {}
-  ~CmdLineOptionInt();
+  ~CmdLineOptionInt() {}
   inline int getValue() const { return valueInt_; }
   inline void setValue(int value) { valueInt_ = value; isValueSet_ = true; }
+  // TODO allow for a range, or min/max
 
 private:
   CmdLineOptionInt(); // Cant call the default version
@@ -99,7 +108,7 @@ public:
       CmdLineOption(cmdLine, helpText, false, OPTION_FLOAT) { setValue(defaultValue); }
   CmdLineOptionFloat(const string &cmdLine, const string &helpText, bool isMandatory=false) :
       CmdLineOption(cmdLine, helpText, isMandatory, OPTION_FLOAT) {}
-  ~CmdLineOptionFloat();
+  ~CmdLineOptionFloat() {}
   inline float getValue() const { return valueFloat_; }
   inline void setValue(float value) { valueFloat_ = value; isValueSet_ = true; }
 
@@ -115,7 +124,7 @@ class CmdLineOptionFlag : public CmdLineOption
 public:
   CmdLineOptionFlag(const string &cmdLine, const string &helpText, bool isMandatory=false, int valueKey=0) :
       CmdLineOption(cmdLine, helpText, isMandatory, OPTION_FLAG), valueKey_(valueKey) {}
-  ~CmdLineOptionFlag();
+  ~CmdLineOptionFlag() {}
   inline bool getValue() const { return isValueSet_; }
   inline int getValueKey() const { return valueKey_; }
   inline void setValue(bool value) { isValueSet_ = true; }
@@ -183,8 +192,10 @@ public:
 private:
   bool isHelpOption(const string &str);
   CmdLineOptionMapType cmdLineOptionMap_;
-  // TODO it would be nice to have groups of mut excl options,
+  // TODO it would be nice to have groups/several of mut excl options,
   //       keyed by an int id: map<int, CmdLineOptionListType>
+  //      Also, it would be nice to have 2 groups of mut excl options:
+  //        groupA: opt1, opt2 are mut excl with groupB: opt3, opt4
   CmdLineOptionListType cmdLineOptionMutExclList_;
   list<string> helpStrList_;
   uint16_t minNumberArgs_;

@@ -49,6 +49,16 @@ void CmdLineParser::addCmdLineOption(CmdLineOption *option)
   if(option)
   {
     cmdLineOptionMap_[option->getCmdLine()] = option;
+    // Add the cmd line aliases too
+    if(option->hasCmdLineAlias())
+    {
+        for(CmdLineOption::CmdLineAliasListType::const_iterator iter = option->getCmdLineAliasIterBegin();
+            iter != option->getCmdLineAliasIterEnd();
+            ++iter)
+        {
+            cmdLineOptionMap_[*iter] = option;
+        }
+    }
   }
 }
 
@@ -92,12 +102,57 @@ void CmdLineParser::printUsage()
       iter != getCmdLineOptionMapIterEnd();
       iter++)
   {
+    string key = iter->first;
     CmdLineOption *option = iter->second;
-    cout << "\t " << option->getCmdLine() << " " << option->getHelpText();
+    if(key != option->getCmdLine())
+    {
+        // If there were alot of aliases, this may not be very efficient, but it should be ok
+        // its an alias, which will be displayed with the main cmd line text
+        continue;
+    }
+
+    cout << "\t " << option->getCmdLine();
+    // If it has aliases, then print those too
+    if(option->hasCmdLineAlias())
+    {
+      for(CmdLineOption::CmdLineAliasListType::const_iterator iter = option->getCmdLineAliasIterBegin();
+          iter != option->getCmdLineAliasIterEnd();
+          ++iter)
+      {
+        cout << ", " << *iter;
+      }
+    }
+
+    // Display the help text
+    cout << ": " << option->getHelpText();
+
+    // Show if its a mandatory option
     if(option->isMandatory())
     {
       cout << ", Mandatory";
     }
+    else
+    {
+      // Display the default value
+      if(option->isValueSet())
+      {
+        cout << " (Default Value: ";
+        if(option->getOptionType() == CmdLineOption::OPTION_STR)
+        {
+          cout << ((CmdLineOptionStr*) option)->getValue();
+        }
+        if(option->getOptionType() == CmdLineOption::OPTION_INT)
+        {
+          cout << ((CmdLineOptionInt*) option)->getValue();
+        }
+        if(option->getOptionType() == CmdLineOption::OPTION_FLOAT)
+        {
+          cout << ((CmdLineOptionFloat*) option)->getValue();
+        }
+        cout << ")";
+      }
+    }
+
     cout << endl;
   }
 
@@ -217,33 +272,36 @@ bool CmdLineParser::parseCmdLine(int argc, char **argv)
   }
 
   // Now check that at least one, and only one of the mutually exclusive options has been set
-  CmdLineOption *prevOption(NULL);
-  for(CmdLineOptionListIteratorType iter = getCmdLineOptionListIterBegin();
-      iter != getCmdLineOptionListIterEnd();
-      iter++)
+  if(getCmdLineOptionListSize() > 0)
   {
-    CmdLineOption *option = *iter;
-    if(option->isValueSet())
+    CmdLineOption *prevOption(NULL);
+    for(CmdLineOptionListIteratorType iter = getCmdLineOptionListIterBegin();
+        iter != getCmdLineOptionListIterEnd();
+        iter++)
     {
-      if(prevOption)
+      CmdLineOption *option = *iter;
+      if(option->isValueSet())
       {
-        cerr << "More than one mutually exclusive option set: "
-             << prevOption->getCmdLine() << " and: " << option->getCmdLine()
-             << endl;
+        if(prevOption)
+        {
+          cerr << "More than one mutually exclusive option set: "
+               << prevOption->getCmdLine() << " and: " << option->getCmdLine()
+               << endl;
 
-        return false;
-      }
-      else
-      {
-        prevOption = option;
+          return false;
+        }
+        else
+        {
+          prevOption = option;
+        }
       }
     }
-  }
 
-  if(!prevOption)
-  {
-    cerr << "At least one of the mutually exclusive options must be set" << endl;
-    return false;
+    if(!prevOption)
+    {
+      cerr << "At least one of the mutually exclusive options must be set" << endl;
+      return false;
+    }
   }
 
   return true;
