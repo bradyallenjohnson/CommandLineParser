@@ -3,5 +3,6 @@
 *.so
 *.mk
 .sconsign.dblite
+exampleSkeletonMain
 build/
 nbproject/

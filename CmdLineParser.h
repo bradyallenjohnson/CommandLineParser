@@ -71,7 +71,7 @@ public:
       CmdLineOption(cmdLine, helpText, false, OPTION_STR) { setValue(defaultValue); }
   CmdLineOptionStr(const string &cmdLine, const string &helpText, bool isMandatory=false) :
       CmdLineOption(cmdLine, helpText, isMandatory, OPTION_STR) {}
-  ~CmdLineOptionStr() {}
+  virtual ~CmdLineOptionStr() {}
   inline string getValue() const { return valueStr_; }
   inline void setValue(const string &value) { if(!value.empty()) {valueStr_ = value; isValueSet_ = true;} }
 
@@ -89,7 +89,7 @@ public:
       CmdLineOption(cmdLine, helpText, false, OPTION_INT) { setValue(defaultValue); }
   CmdLineOptionInt(const string &cmdLine, const string &helpText, bool isMandatory=false) :
       CmdLineOption(cmdLine, helpText, isMandatory, OPTION_INT) {}
-  ~CmdLineOptionInt() {}
+  virtual ~CmdLineOptionInt() {}
   inline int getValue() const { return valueInt_; }
   inline void setValue(int value) { valueInt_ = value; isValueSet_ = true; }
   // TODO allow for a range, or min/max
@@ -108,7 +108,7 @@ public:
       CmdLineOption(cmdLine, helpText, false, OPTION_FLOAT) { setValue(defaultValue); }
   CmdLineOptionFloat(const string &cmdLine, const string &helpText, bool isMandatory=false) :
       CmdLineOption(cmdLine, helpText, isMandatory, OPTION_FLOAT) {}
-  ~CmdLineOptionFloat() {}
+  virtual ~CmdLineOptionFloat() {}
   inline float getValue() const { return valueFloat_; }
   inline void setValue(float value) { valueFloat_ = value; isValueSet_ = true; }
 
@@ -124,7 +124,7 @@ class CmdLineOptionFlag : public CmdLineOption
 public:
   CmdLineOptionFlag(const string &cmdLine, const string &helpText, bool isMandatory=false, int valueKey=0) :
       CmdLineOption(cmdLine, helpText, isMandatory, OPTION_FLAG), valueKey_(valueKey) {}
-  ~CmdLineOptionFlag() {}
+  virtual ~CmdLineOptionFlag() {}
   inline bool getValue() const { return isValueSet_; }
   inline int getValueKey() const { return valueKey_; }
   inline void setValue(bool value) { isValueSet_ = true; }

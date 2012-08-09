@@ -17,6 +17,20 @@ CmdLineParser::CmdLineParser() : minNumberArgs_(0), maxNumberArgs_(0)
 
 CmdLineParser::~CmdLineParser()
 {
+  // The same Option is stored in both the cmdLineOptionMap_ and
+  // the cmdLineOptionMutExclList_, so we need to delete them
+  // from one and just empty the other
+  CmdLineOptionMapIteratorType iter;
+  for(iter = cmdLineOptionMap_.begin(); iter != cmdLineOptionMap_.end(); ++iter)
+  {
+    CmdLineOption *option(iter->second);
+    delete option;
+  }
+
+  while(!cmdLineOptionMutExclList_.empty())
+  {
+    cmdLineOptionMutExclList_.pop_front();
+  }
 }
 
 bool CmdLineParser::isHelpOption(const string &str)
